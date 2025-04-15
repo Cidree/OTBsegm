@@ -13,3 +13,4 @@ Imports:
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 License: MIT + file LICENSE
+URL: https://cidree.github.io/OTBsegm/

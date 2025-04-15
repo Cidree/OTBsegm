@@ -20,7 +20,7 @@ authors:
 reference:
 
   - title: "Segmentation algorithms"
-    desc: Functions for image segmentation
+    desc: Functions to apply segmentation algorithms from Orfeo ToolBox
     contents:
     - segm_lsms
     - segm_meanshift

@@ -6,3 +6,4 @@ internal/*
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^\.github$
