@@ -60,7 +60,7 @@ The image is a 500x500 meters RGB tile, with a spatial resolution of 15 cm in Ga
 
 * **ranger**: range radius defining the radius (expressed in radiometry unit) in the multispectral space
 
-* **minsize**: minimum size of a region (in pixel unit) in segmentation. Smaller clusters will be merged to the neighboring cluster with the closest radiometry. If set to 0 no pruning is done.
+* **minsize**: minimum size of a region (in pixel unit) in segmentation. Smaller clusters will be merged to the neighboring cluster with the closest radiometry. If set to 0 no pruning is done. The image's resolution is 1.2 m, therefore, a value of `minsize = 10` means that the smallest segment will be $10 * 1.2^2 = 14.4 m^2$.
 
 In order to use the algorithms, we need to link our OTB installation using {`link2GI`}:
 
@@ -70,14 +70,14 @@ otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
 
 Once we are connected, we can apply the segmentation algorithm and visualize the results:
 
-
 ```{r}
 results_ms_sf <- segm_meanshift(
     image    = image_sr,
-    otb      =  otblink,
+    otb      = otblink,
     spatialr = 5,
-    ranger   = 40,
-    minsize  = 100L
+    ranger   = 25,
+    maxiter  = 10,
+    minsize  = 10
 )
 ```
 

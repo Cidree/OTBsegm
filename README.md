@@ -72,7 +72,9 @@ arguments:
 
 - **minsize**: minimum size of a region (in pixel unit) in segmentation.
   Smaller clusters will be merged to the neighboring cluster with the
-  closest radiometry. If set to 0 no pruning is done.
+  closest radiometry. If set to 0 no pruning is done. The image’s
+  resolution is 1.2 m, therefore, a value of `minsize = 10` means that
+  the smallest segment will be $10 * 1.2^2 = 14.4 m^2$.
 
 In order to use the algorithms, we need to link our OTB installation
 using {`link2GI`}:
@@ -87,18 +89,19 @@ visualize the results:
 ``` r
 results_ms_sf <- segm_meanshift(
     image    = image_sr,
-    otb      =  otblink,
+    otb      = otblink,
     spatialr = 5,
-    ranger   = 40,
-    minsize  = 100L
+    ranger   = 25,
+    maxiter  = 10,
+    minsize  = 10
 )
-#> Reading layer `file72281844ebe' from data source 
-#>   `C:\Users\User\AppData\Local\Temp\RtmpEPZgGK\file72281844ebe.shp' 
+#> Reading layer `file19bc26422700' from data source 
+#>   `C:\Users\User\AppData\Local\Temp\RtmpkzDuvU\file19bc26422700.shp' 
 #>   using driver `ESRI Shapefile'
-#> Simple feature collection with 6947 features and 1 field
-#> Geometry type: MULTIPOLYGON
+#> Simple feature collection with 811 features and 1 field
+#> Geometry type: POLYGON
 #> Dimension:     XY
-#> Bounding box:  xmin: 608000 ymin: 4713000 xmax: 608500 ymax: 4713500
+#> Bounding box:  xmin: 621000 ymin: 4708385 xmax: 621300 ymax: 4708685
 #> Projected CRS: ETRS89 / UTM zone 29N
 ```
 

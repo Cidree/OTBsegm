@@ -4,7 +4,6 @@ Title: Apply Unsupervised Segmentation Algorithms from OTB
 Version: 0.1.0
 Authors@R: person("Adrián", "Cidre González", email = "adrian.cidre@gmail.com", role = c("aut", "cre"))
 Description: Functions for applying unsupervised segmentation algorithms included in Orfeo ToolBox software, such as meanshift segmentation or watershed segmentation.
-License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Imports: 
@@ -13,3 +12,4 @@ Imports:
     link2GI
 RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
+License: MIT + file LICENSE

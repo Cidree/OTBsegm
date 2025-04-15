@@ -24,7 +24,7 @@ segm_meanshift(
 \arguments{
 \item{image}{path or \code{SpatRaster}}
 
-\item{otb}{output of link2GI::linkOTB()}
+\item{otb}{output of \code{\link[link2GI:linkOTB]{link2GI::linkOTB()}}}
 
 \item{spatialr}{integer. Spatial radius of the neighborhood}
 
@@ -98,4 +98,28 @@ The processing mode 'vector' will output a vector file, and process the input
 image piecewise. This allows performing segmentation of very large images. IN
 contrast, 'raster' mode will output a labeled raster, and it cannot handle
 large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
+}
+\examples{
+\dontrun{
+## load packages
+library(link2GI)
+library(OTBsegm)
+library(terra)
+
+## load sample image
+image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+
+## connect to OTB (change to your directory)
+otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+
+## apply segmentation
+results_ms_sf <- segm_meanshift(
+    image    = image_sr,
+    otb      = otblink,
+    spatialr = 5,
+    ranger   = 25,
+    maxiter  = 10,
+    minsize  = 10
+)
+}
 }
