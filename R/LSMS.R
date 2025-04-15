@@ -6,7 +6,7 @@
 #' or a SpatRaster. Suitable for large images
 #'
 #' @param image path to raster, or SpatRaster
-#' @param otb output of link2GI::linkOTB()
+#' @param otb output of [link2GI::linkOTB()]
 #' @param spatialr integer. Spatial radius of the neighborhood
 #' @param ranger range radius defining the radius (expressed in radiometry unit)
 #' in the multispectral space
@@ -54,7 +54,31 @@
 #' contrast, 'raster' mode will output a labeled raster, and it cannot handle
 #' large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
 #'
+#' @examples
+#' \dontrun{
+#' ## load packages
+#' library(link2GI)
+#' library(OTBsegm)
+#' library(terra)
 #'
+#' ## load sample image
+#' image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+#'
+#' ## connect to OTB (change to your directory)
+#' otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+#'
+#' ## apply segmentation
+#' results_ms_sf <- segm_lsms(
+#'     image = image_sr,
+#'     otb   = otblink,
+#'     spatialr = 5,
+#'     ranger   = 25,
+#'     minsize  = 10
+#' )
+#'
+#' plotRGB(image_sr)
+#' plot(st_geometry(results_ms_sf), add = TRUE)
+#' }
 segm_lsms <- function(image,
                       otb,
                       spatialr = 5L,

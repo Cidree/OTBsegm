@@ -4,7 +4,7 @@
 #' or a SpatRaster
 #'
 #' @param image path or `SpatRaster`
-#' @param otb output of link2GI::linkOTB()
+#' @param otb output of [link2GI::linkOTB()]
 #' @param spatialr integer. Spatial radius of the neighborhood
 #' @param ranger range radius defining the radius (expressed in radiometry unit)
 #' in the multispectral space
@@ -64,7 +64,29 @@
 #' contrast, 'raster' mode will output a labeled raster, and it cannot handle
 #' large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
 #'
+#' @examples
+#' \dontrun{
+#' ## load packages
+#' library(link2GI)
+#' library(OTBsegm)
+#' library(terra)
 #'
+#' ## load sample image
+#' image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+#'
+#' ## connect to OTB (change to your directory)
+#' otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+#'
+#' ## apply segmentation
+#' results_ms_sf <- segm_meanshift(
+#'     image    = image_sr,
+#'     otb      = otblink,
+#'     spatialr = 5,
+#'     ranger   = 25,
+#'     maxiter  = 10,
+#'     minsize  = 10
+#' )
+#' }
 segm_meanshift <- function(image,
                            otb,
                            spatialr = 5L,
@@ -116,6 +138,9 @@ segm_meanshift <- function(image,
         cmd$mode.vector.inmask   <- mask
         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
         cmd$mode.vector.stitch   <- tolower(vector_stitch)
+        cmd$mode.vector.tilesize <- vector_tilesize
+        cmd$mode.vector.minsize <- vector_minsize
+        cmd$mode.vector.simplify <- vector_simplify
     } else {
         segm.out.path       <- tempfile(fileext = ".tiff")
         cmd$mode.raster.out <- segm.out.path
@@ -140,112 +165,138 @@ segm_meanshift <- function(image,
 
 
 
-#' Connected components segmentation
-#'
-#' Applies the connected components segmentation algorithm to an image file
-#' or a SpatRaster
-#'
-#' @param image path or `SpatRaster`
-#' @param otb output of link2GI::linkOTB()
-#' @param expr user defined connection condition, written as a mathematical expression.
-#' Available variables are 'p(i)b(i)', 'intensity_p(i)', and 'distance'. Substitute
-#' (i) by the desired value (e.g. 'intensity_p2 Z 0.5')
-#' @param mode processing mode, either 'vector' or 'raster'. See details
-#' @param vector_neighbor logical. If FALSE (the default) a 4-neighborhood connectivity
-#' is activated. If TRUE, a 8-neighborhood connectivity is used
-#' @param vector_stitch logical. If TRUE (the default), scans polygons on each side
-#' of tiles and stitch polygons which connect by more than one pixel
-#' @param vector_minsize integer. Objects whose size in pixels is below the minimum
-#' object size will be ignored during vectorization
-#' @param vector_simplify simplify polygons according to a given tolerance (in pixel).
-#' This option allows reducing the size of the output file or database.
-#' @param vector_tilesize integer. User defined tiles size for tile-based segmentation.
-#' Optimal tile size is selected according to available RAM if NULL
-#' @param mask an optional raster used for masking the segmentation. Only pixels
-#' whose mask is strictly positive will be segmented
-#'
-#' @returns `sf` or `SpatRaster`
-#' @export
-#'
-#' @details
-#'
-#' The connected components segmentation algorithm groups neighboring pixels with
-#' similar properties into distinct labeled regions. This method works by identifying
-#' sets of adjacent pixels that share the same value or meet a prefined similarity
-#' criterion. Steps:
-#'
-#' 1. Initialization: Each pixel is analyzed to determine if it shares a connection
-#' (4- or 8-connectivity) with its neighbors based on intensity, color,
-#' or other attributes.
-#'
-#' 2. Grouping: Pixels connected by similarity form a region, and each region is
-#' assigned a unique label.
-#'
-#' 3. Label Propagation: The algorithm iterates over the image, assigning the same
-#' label to all connected pixels within a region.
-#'
-#' 4. Output: A segmented image is generated where each region has a unique identifier.
-#'
-#' The processing mode 'vector' will output a vector file, and process the input
-#' image piecewise. This allows performing segmentation of very large images. IN
-#' contrast, 'raster' mode will output a labeled raster, and it cannot handle
-#' large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
-#'
-segm_connected_components <- function(image,
-                                      otb,
-                                      expr            = "distance > 10",
-                                      mode            = "vector",
-                                      vector_neighbor = FALSE,
-                                      vector_stitch   = TRUE,
-                                      vector_minsize  = 1L,
-                                      vector_simplify = 0.1,
-                                      vector_tilesize = 1024L,
-                                      mask            = NULL
-
-) {
-
-    ## 1. Prepare image
-    if (inherits(image, "SpatRaster")) {
-        image.path <- tempfile(fileext = ".tiff")
-        terra::writeRaster(image, image.path)
-    } else if (is.character(image)) {
-        image.path <- image
-    } else {
-        cli::cli_abort("<image> in invalid format")
-    }
-
-    ## 2. Prepare algorithm
-    cmd <- link2GI::parseOTBFunction(algo = "Segmentation", gili = otb)
-
-    ## 3. Update parameters
-    cmd$input_in       <- image.path
-    cmd$filter         <- "cc"
-    cmd$filter.cc.expr <- expr
-
-    ## 4. Vector or raster mode ?
-    cmd$mode <- mode
-    if (mode == "vector") {
-        segm.out.path            <- tempfile(fileext = ".shp")
-        cmd$mode.vector.out      <- segm.out.path
-        cmd$mode.vector.inmask   <- mask
-        cmd$mode.vector.neighbor <- tolower(vector_neighbor)
-        cmd$mode.vector.stitch   <- tolower(vector_stitch)
-    } else {
-        segm.out.path       <- tempfile(fileext = ".tiff")
-        cmd$mode.raster.out <- segm.out.path
-
-    }
-
-    ## 5. Run algorithm
-    segm <- link2GI::runOTB(
-        otbCmdList = cmd,
-        gili       = otb
-    )
-
-    ## Results
-    return(segm)
-
-}
+# #' Connected components segmentation
+# #'
+# #' Applies the connected components segmentation algorithm to an image file
+# #' or a SpatRaster
+# #'
+# #' @param image path or `SpatRaster`
+# #' @param otb output of [link2GI::linkOTB()]
+# #' @param expr user defined connection condition, written as a mathematical expression.
+# #' Available variables are 'p(i)b(i)', 'intensity_p(i)', and 'distance'. Substitute
+# #' (i) by the desired value (e.g. 'intensity_p2 Z 0.5')
+# #' @param mode processing mode, either 'vector' or 'raster'. See details
+# #' @param vector_neighbor logical. If FALSE (the default) a 4-neighborhood connectivity
+# #' is activated. If TRUE, a 8-neighborhood connectivity is used
+# #' @param vector_stitch logical. If TRUE (the default), scans polygons on each side
+# #' of tiles and stitch polygons which connect by more than one pixel
+# #' @param vector_minsize integer. Objects whose size in pixels is below the minimum
+# #' object size will be ignored during vectorization
+# #' @param vector_simplify simplify polygons according to a given tolerance (in pixel).
+# #' This option allows reducing the size of the output file or database.
+# #' @param vector_tilesize integer. User defined tiles size for tile-based segmentation.
+# #' Optimal tile size is selected according to available RAM if NULL
+# #' @param mask an optional raster used for masking the segmentation. Only pixels
+# #' whose mask is strictly positive will be segmented
+# #'
+# #' @returns `sf` or `SpatRaster`
+# #' @export
+# #'
+# #' @details
+# #'
+# #' The connected components segmentation algorithm groups neighboring pixels with
+# #' similar properties into distinct labeled regions. This method works by identifying
+# #' sets of adjacent pixels that share the same value or meet a prefined similarity
+# #' criterion. Steps:
+# #'
+# #' 1. Initialization: Each pixel is analyzed to determine if it shares a connection
+# #' (4- or 8-connectivity) with its neighbors based on intensity, color,
+# #' or other attributes.
+# #'
+# #' 2. Grouping: Pixels connected by similarity form a region, and each region is
+# #' assigned a unique label.
+# #'
+# #' 3. Label Propagation: The algorithm iterates over the image, assigning the same
+# #' label to all connected pixels within a region.
+# #'
+# #' 4. Output: A segmented image is generated where each region has a unique identifier.
+# #'
+# #' The processing mode 'vector' will output a vector file, and process the input
+# #' image piecewise. This allows performing segmentation of very large images. IN
+# #' contrast, 'raster' mode will output a labeled raster, and it cannot handle
+# #' large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
+# #'
+# #' @examples
+# #' \dontrun
+# #' ## load packages
+# #' library(link2GI)
+# #' library(OTBsegm)
+# #' library(terra)
+# #'
+# #' ## load sample image
+# #' image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+# #'
+# #' ## connect to OTB (change to your directory)
+# #' otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+# #'
+# #' ## apply segmentation
+# #' results_ms_sf <- segm_connected_components(
+# #'     image = image_sr,
+# #'     otb   = otblink,
+# #'     expr  = "distance > 1"
+# #' )
+# #' }
+# segm_connected_components <- function(image,
+#                                       otb,
+#                                       expr            = "distance > 10",
+#                                       mode            = "vector",
+#                                       vector_neighbor = FALSE,
+#                                       vector_stitch   = TRUE,
+#                                       vector_minsize  = 1L,
+#                                       vector_simplify = 0.1,
+#                                       vector_tilesize = 1024L,
+#                                       mask            = NULL
+#
+# ) {
+#     ## 0. Errors and checks
+#     vector_minsize  <- as.integer(round(vector_minsize))
+#     vector_tilesize <- as.integer(round(vector_tilesize))
+#
+#     ## 1. Prepare image
+#     if (inherits(image, "SpatRaster")) {
+#         image.path <- tempfile(fileext = ".tiff")
+#         terra::writeRaster(image, image.path)
+#     } else if (is.character(image)) {
+#         image.path <- image
+#     } else {
+#         cli::cli_abort("<image> in invalid format")
+#     }
+#
+#     ## 2. Prepare algorithm
+#     cmd <- link2GI::parseOTBFunction(algo = "Segmentation", gili = otb)
+#
+#     ## 3. Update parameters
+#     cmd$input_in       <- image.path
+#     cmd$filter         <- "cc"
+#     cmd$filter.cc.expr <- expr
+#
+#     ## 4. Vector or raster mode ?
+#     cmd$mode <- mode
+#     if (mode == "vector") {
+#         segm.out.path            <- tempfile(fileext = ".shp")
+#         cmd$mode.vector.out      <- segm.out.path
+#         cmd$mode.vector.inmask   <- mask
+#         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
+#         cmd$mode.vector.stitch   <- tolower(vector_stitch)
+#         cmd$mode.vector.minsize  <- vector_minsize
+#         cmd$mode.vector.tilesize  <- vector_tilesize
+#         cmd$mode.vector.simplify <- vector_simplify
+#     } else {
+#         segm.out.path       <- tempfile(fileext = ".tiff")
+#         cmd$mode.raster.out <- segm.out.path
+#
+#     }
+#
+#     ## 5. Run algorithm
+#     segm <- link2GI::runOTB(
+#         otbCmdList = cmd,
+#         gili       = otb
+#     )
+#
+#     ## Results
+#     return(segm)
+#
+# }
 
 
 #' Watershed segmentation
@@ -254,7 +305,7 @@ segm_connected_components <- function(image,
 #' or a SpatRaster
 #'
 #' @param image path or `SpatRaster`
-#' @param otb output of link2GI::linkOTB()
+#' @param otb output of [link2GI::linkOTB()]
 #' @param thresh depth threshold units in percentage of the maximum depth in the image
 #' @param level flood level for generating the merge tree from the initial segmentation
 #' (from 0 to 1)
@@ -297,6 +348,27 @@ segm_connected_components <- function(image,
 #' contrast, 'raster' mode will output a labeled raster, and it cannot handle
 #' large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
 #'
+#' @examples
+#' \dontrun{
+#' ## load packages
+#' library(link2GI)
+#' library(OTBsegm)
+#' library(terra)
+#'
+#' ## load sample image
+#' image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+#'
+#' ## connect to OTB (change to your directory)
+#' otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+#'
+#' ## apply segmentation
+#' results_ms_sf <- segm_watershed(
+#'     image  = image_sr,
+#'     otb    = otblink,
+#'     thresh = .1,
+#'     level  = .2
+#' )
+#' }
 segm_watershed <- function(image,
                            otb,
                            thresh          = 0.01,
@@ -313,6 +385,8 @@ segm_watershed <- function(image,
 
     ## 0. Manage errors
     if (level < 0 | level > 1) cli::cli_abort("<level> must be between 0 and 1")
+    vector_minsize  <- as.integer(round(vector_minsize))
+    vector_tilesize <- as.integer(round(vector_tilesize))
 
     ## 1. Prepare image
     if (inherits(image, "SpatRaster")) {
@@ -341,6 +415,9 @@ segm_watershed <- function(image,
         cmd$mode.vector.inmask   <- mask
         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
         cmd$mode.vector.stitch   <- tolower(vector_stitch)
+        cmd$mode.vector.minsize  <- vector_minsize
+        cmd$mode.vector.tilesize  <- vector_tilesize
+        cmd$mode.vector.simplify <- vector_simplify
     } else {
         segm.out.path       <- tempfile(fileext = ".tiff")
         cmd$mode.raster.out <- segm.out.path
@@ -367,7 +444,7 @@ segm_watershed <- function(image,
 #' or a SpatRaster
 #'
 #' @param image path or `SpatRaster`
-#' @param otb output of link2GI::linkOTB()
+#' @param otb output of [link2GI::linkOTB()]
 #' @param size integer. Size of the profiles
 #' @param start integer. Initial radius of the structuring element in pixels
 #' @param step integer. Radius step in pixels along the profile
@@ -417,6 +494,29 @@ segm_watershed <- function(image,
 #' contrast, 'raster' mode will output a labeled raster, and it cannot handle
 #' large data. If mode is 'raster', all the 'vector_*' arguments are ignored.
 #'
+#' @examples
+#' \dontrun{
+#' ## load packages
+#' library(link2GI)
+#' library(OTBsegm)
+#' library(terra)
+#'
+#' ## load sample image
+#' image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+#'
+#' ## connect to OTB (change to your directory)
+#' otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+#'
+#' ## apply segmentation
+#' results_ms_sf <- segm_mprofiles(
+#'     image = image_sr,
+#'     otb   = otblink,
+#'     size  = 5,
+#'     start = 3,
+#'     step  = 20,
+#'     sigma = 1
+#' )
+#' }
 segm_mprofiles <- function(image,
                            otb,
                            size   = 5L,
@@ -464,6 +564,9 @@ segm_mprofiles <- function(image,
         cmd$mode.vector.inmask   <- mask
         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
         cmd$mode.vector.stitch   <- tolower(vector_stitch)
+        cmd$mode.vector.minsize  <- vector_minsize
+        cmd$mode.vector.tilesize  <- vector_tilesize
+        cmd$mode.vector.simplify <- vector_simplify
     } else {
         segm.out.path       <- tempfile(fileext = ".tiff")
         cmd$mode.raster.out <- segm.out.path
