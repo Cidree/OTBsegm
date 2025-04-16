@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# OTBsegm
+# OTBsegm <a href="https://cidree.github.io/OTBsegm/"><img src="man/figures/logo.png" align="right" height="138" alt="OTBsegm website" /></a>
 
 <!-- badges: start -->
 
@@ -95,8 +95,8 @@ results_ms_sf <- segm_meanshift(
     maxiter  = 10,
     minsize  = 10
 )
-#> Reading layer `file19bc26422700' from data source 
-#>   `C:\Users\User\AppData\Local\Temp\RtmpkzDuvU\file19bc26422700.shp' 
+#> Reading layer `filecfc6b37181f' from data source 
+#>   `C:\Users\User\AppData\Local\Temp\RtmpAjZLFx\filecfc6b37181f.shp' 
 #>   using driver `ESRI Shapefile'
 #> Simple feature collection with 811 features and 1 field
 #> Geometry type: POLYGON

@@ -13,8 +13,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# OTBsegm
-
+# OTBsegm <a href="https://cidree.github.io/OTBsegm/"><img src="man/figures/logo.png" align="right" height="138" alt="OTBsegm website" /></a>
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/OTBsegm)](https://CRAN.R-project.org/package=OTBsegm)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
