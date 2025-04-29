@@ -3,7 +3,7 @@ Type: Package
 Title: Apply Unsupervised Segmentation Algorithms from 'OTB'
 Version: 0.1.0
 Authors@R: person("Adrián", "Cidre González", email = "adrian.cidre@gmail.com", role = c("aut", "cre"))
-Description: Functions for applying unsupervised segmentation algorithms included in 'Orfeo ToolBox' software, such as mean shift or watershed segmentation.
+Description: Apply unsupervised segmentation algorithms included in 'Orfeo ToolBox' software (<https://www.orfeo-toolbox.org/>), such as mean shift or watershed segmentation.
 Encoding: UTF-8
 LazyData: true
 Imports: 
@@ -14,3 +14,6 @@ RoxygenNote: 7.3.2
 Roxygen: list(markdown = TRUE)
 License: MIT + file LICENSE
 URL: https://cidree.github.io/OTBsegm/
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
