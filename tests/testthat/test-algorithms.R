@@ -1,129 +1,71 @@
-
-
-# 1. set up ---------------------------------------------------------------
+# 1. Setup ---------------------------------------------------------------
 
 ## load packages
+library(testthat)
 library(link2GI)
 library(terra)
 
-## load sample image
-image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+test_that("OTB segmentation functions run and return expected output", {
 
-## crop for short running test
-image_crop_sr <- crop(image_sr, ext(621000, 621050, 4708385, 4708435))
+  # Attempt to link to OTB
+  otblink <- tryCatch(
+    link2GI::linkOTB(searchLocation = Sys.getenv("OTB_PATH", "C:/OTB/")),
+    error = function(e) NULL
+  )
 
-## connect to OTB (change to your directory)
-otblink <- link2GI::linkOTB(searchLocation = "C:/OTB/")
+  # Skip tests if OTB not available
+  skip_if(is.null(otblink), "OTB not available; skipping segmentation tests.")
 
-# 2. Test meanshift -------------------------------------------------------
+  # Load sample image
+  image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
+  image_crop_sr <- crop(image_sr, ext(621000, 621050, 4708385, 4708435))
 
-## apply segmentation
-results_ms_sf <- segm_meanshift(
+  # 2. Meanshift ----------------------------------------------------------
+  results_ms_sf <- segm_meanshift(
     image    = image_crop_sr,
     otb      = otblink,
     spatialr = 10,
     ranger   = 50,
     maxiter  = 2,
     minsize  = 10
-)
-
-
-## test meanshift
-test_that("Meanshift is sf", {
+  )
   expect_s3_class(results_ms_sf, "sf")
-})
+  expect_gt(nrow(results_ms_sf), 0)
+  expect_equal(as.vector(ext(image_crop_sr)), as.vector(ext(results_ms_sf)))
 
-test_that("Meanshift has rows", {
-    expect_gt(nrow(results_ms_sf), 0)
-})
-
-test_that("Meanshift has same extent as input", {
-    expect_equal(
-        as.vector(ext(image_crop_sr)),
-        as.vector(ext(results_ms_sf))
-    )
-})
-
-# 3. Test watershed -------------------------------------------------------
-
-## apply segmentation
-results_ws_sf <- segm_watershed(
+  # 3. Watershed ----------------------------------------------------------
+  results_ws_sf <- segm_watershed(
     image  = image_crop_sr,
     otb    = otblink,
-    thresh = .1,
-    level  = .2
-)
+    thresh = 0.1,
+    level  = 0.2
+  )
+  expect_s3_class(results_ws_sf, "sf")
+  expect_gt(nrow(results_ws_sf), 0)
+  expect_equal(as.vector(ext(image_crop_sr)), as.vector(ext(results_ws_sf)))
 
-
-## test meanshift
-test_that("Watershed is sf", {
-    expect_s3_class(results_ws_sf, "sf")
-})
-
-test_that("Watershed has rows", {
-    expect_gt(nrow(results_ws_sf), 0)
-})
-
-test_that("Watershed has same extent as input", {
-    expect_equal(
-        as.vector(ext(image_crop_sr)),
-        as.vector(ext(results_ws_sf))
-    )
-})
-
-# 4. Test mprofiles -------------------------------------------------------
-
-## apply segmentation
-results_mprofiles_sf <- segm_mprofiles(
+  # 4. Morphological profiles ---------------------------------------------
+  results_mprofiles_sf <- segm_mprofiles(
     image = image_crop_sr,
     otb   = otblink,
     size  = 5,
     start = 3,
     step  = 20,
     sigma = 1
-)
+  )
+  expect_s3_class(results_mprofiles_sf, "sf")
+  expect_gt(nrow(results_mprofiles_sf), 0)
+  expect_equal(as.vector(ext(image_crop_sr)), as.vector(ext(results_mprofiles_sf)))
 
-
-## test meanshift
-test_that("Morphological profiles is sf", {
-    expect_s3_class(results_mprofiles_sf, "sf")
-})
-
-test_that("Morphological profiles has rows", {
-    expect_gt(nrow(results_mprofiles_sf), 0)
-})
-
-test_that("Morphological profiles has same extent as input", {
-    expect_equal(
-        as.vector(ext(image_crop_sr)),
-        as.vector(ext(results_mprofiles_sf))
-    )
-})
-
-# 5. Test LSMS ------------------------------------------------------------
-
-## apply segmentation
-results_lsms_sf <- segm_lsms(
-    image = image_crop_sr,
-    otb   = otblink,
+  # 5. LSMS ---------------------------------------------------------------
+  results_lsms_sf <- segm_lsms(
+    image    = image_crop_sr,
+    otb      = otblink,
     spatialr = 5,
     ranger   = 25,
     minsize  = 10
-)
-
-
-## test meanshift
-test_that("LSMS is sf", {
-    expect_s3_class(results_lsms_sf, "sf")
-})
-
-test_that("LSMS has rows", {
-    expect_gt(nrow(results_lsms_sf), 0)
-})
-
-test_that("LSMS has same extent as input", {
-    expect_equal(
-        as.vector(ext(image_crop_sr)),
-        as.vector(ext(results_lsms_sf))
-    )
+  )
+  expect_s3_class(results_lsms_sf, "sf")
+  expect_gt(nrow(results_lsms_sf), 0)
+  expect_equal(as.vector(ext(image_crop_sr)), as.vector(ext(results_lsms_sf)))
 })
