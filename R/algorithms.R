@@ -142,7 +142,7 @@ segm_meanshift <- function(image,
         cmd$mode.vector.minsize <- vector_minsize
         cmd$mode.vector.simplify <- vector_simplify
         if (inherits(mask, "SpatRaster")) {
-            mask.path <- tempfile(fileext = "tiff")
+            mask.path <- tempfile(fileext = ".tiff")
             terra::writeRaster(mask, mask.path)
             cmd$mode.vector.inmask   <- mask.path
         }
@@ -424,7 +424,7 @@ segm_watershed <- function(image,
         cmd$mode.vector.tilesize  <- vector_tilesize
         cmd$mode.vector.simplify <- vector_simplify
         if (inherits(mask, "SpatRaster")) {
-            mask.path <- tempfile(fileext = "tiff")
+            mask.path <- tempfile(fileext = ".tiff")
             terra::writeRaster(mask, mask.path)
             cmd$mode.vector.inmask   <- mask.path
         }
@@ -578,7 +578,7 @@ segm_mprofiles <- function(image,
         cmd$mode.vector.tilesize  <- vector_tilesize
         cmd$mode.vector.simplify <- vector_simplify
         if (inherits(mask, "SpatRaster")) {
-            mask.path <- tempfile(fileext = "tiff")
+            mask.path <- tempfile(fileext = ".tiff")
             terra::writeRaster(mask, mask.path)
             cmd$mode.vector.inmask   <- mask.path
         }
