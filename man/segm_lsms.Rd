@@ -12,7 +12,6 @@ segm_lsms(
   minsize = 100L,
   tilesize = 500L,
   mode = "vector",
-  mask = NULL,
   ram = 256L
 )
 }
@@ -33,9 +32,6 @@ If set to 0 no pruning is done}
 \item{tilesize}{integer. Size of the tiles during the tile-wise processing}
 
 \item{mode}{processing mode, either 'vector' or 'raster'. See details}
-
-\item{mask}{an optional raster used for masking the segmentation. Only pixels
-whose mask is strictly positive will be segmented}
 
 \item{ram}{integer. Available memory for processing (in MB)}
 }
