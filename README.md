@@ -16,6 +16,8 @@ v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/li
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+[![Last Month
+Downloads](https://cranlogs.r-pkg.org/badges/last-month/OTBsegm?color=green)](https://CRAN.R-project.org/package=OTBsegm)
 <!-- badges: end -->
 
 **OTBsegm** is an R package that provides a user-friendly interface to
@@ -49,8 +51,7 @@ We will see how to segment an image included in the package:
 library(link2GI)
 library(OTBsegm)
 library(terra)
-#> Warning: package 'terra' was built under R version 4.4.3
-#> terra 1.8.29
+#> terra 1.8.50
 
 ## load image
 image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
@@ -95,8 +96,8 @@ results_ms_sf <- segm_meanshift(
     maxiter  = 10,
     minsize  = 10
 )
-#> Reading layer `filecfc6b37181f' from data source 
-#>   `C:\Users\User\AppData\Local\Temp\RtmpAjZLFx\filecfc6b37181f.shp' 
+#> Reading layer `file7054158ad50' from data source 
+#>   `C:\Users\User\AppData\Local\Temp\Rtmp8O6UBy\file7054158ad50.shp' 
 #>   using driver `ESRI Shapefile'
 #> Simple feature collection with 811 features and 1 field
 #> Geometry type: POLYGON
