@@ -12,6 +12,7 @@ test_that("OTB segmentation functions run and return expected output", {
     link2GI::linkOTB(searchLocation = Sys.getenv("OTB_PATH", "C:/OTB/")) |> suppressWarnings(),
     error = function(e) NULL
   )
+  print("Prinnting otblink")
   print(otblink)
   # Load sample image
   image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
