@@ -135,7 +135,6 @@ segm_meanshift <- function(image,
     if (mode == "vector") {
         segm.out.path            <- tempfile(fileext = ".shp")
         cmd$mode.vector.out      <- segm.out.path
-        cmd$mode.vector.inmask   <- mask
         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
         cmd$mode.vector.stitch   <- tolower(vector_stitch)
         cmd$mode.vector.tilesize <- vector_tilesize
@@ -417,7 +416,6 @@ segm_watershed <- function(image,
     if (mode == "vector") {
         segm.out.path            <- tempfile(fileext = ".shp")
         cmd$mode.vector.out      <- segm.out.path
-        cmd$mode.vector.inmask   <- mask
         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
         cmd$mode.vector.stitch   <- tolower(vector_stitch)
         cmd$mode.vector.minsize  <- vector_minsize
@@ -571,7 +569,6 @@ segm_mprofiles <- function(image,
     if (mode == "vector") {
         segm.out.path            <- tempfile(fileext = ".shp")
         cmd$mode.vector.out      <- segm.out.path
-        cmd$mode.vector.inmask   <- mask
         cmd$mode.vector.neighbor <- tolower(vector_neighbor)
         cmd$mode.vector.stitch   <- tolower(vector_stitch)
         cmd$mode.vector.minsize  <- vector_minsize
