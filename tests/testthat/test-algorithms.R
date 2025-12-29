@@ -8,8 +8,11 @@ library(terra)
 test_that("OTB segmentation functions run and return expected output", {
 
   # Attempt to link to OTB
-  otblink <- NULL
-
+  otblink <- tryCatch(
+    link2GI::linkOTB(searchLocation = Sys.getenv("OTB_PATH", "C:/OTB/")) |> suppressWarnings(),
+    error = function(e) NULL
+  )
+  print(otblink)
   # Load sample image
   image_sr <- rast(system.file("raster/pnoa.tiff", package = "OTBsegm"))
   image_crop_sr <- crop(image_sr, ext(621000, 621050, 4708385, 4708435))
