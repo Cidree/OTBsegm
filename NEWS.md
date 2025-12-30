@@ -1,6 +1,8 @@
 
 # OTBsegm 0.1.1
 
+Solve CRAN errors tests on Linux.
+
 ## BUG FIXES
 
 * Mask wasn't properly used in `segm_meanshift()`, `segm_watershed()`, and `segm_mprofiles()`

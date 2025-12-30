@@ -1,10 +1,9 @@
 ## R CMD check results
 
-checking for future file timestamps ... NOTE
-  unable to verify current time
-  
-0 errors | 0 warnings | 1 note
+```
+Duration: 27.5s
 
-* This is a new release.
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+```
 
 * This package needs an installation of 'Orfeo ToolBox' software to work. Therefore, examples are wrapped with '\dontrun'
