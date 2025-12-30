@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles: {}
-last_built: 2025-12-29T14:19Z
+last_built: 2025-12-30T09:31Z
 urls:
   reference: https://cidree.github.io/OTBsegm/reference
   article: https://cidree.github.io/OTBsegm/articles
