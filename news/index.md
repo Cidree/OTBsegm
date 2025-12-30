@@ -2,6 +2,8 @@
 
 ## OTBsegm 0.1.1
 
+Solve CRAN errors tests on Linux.
+
 ### BUG FIXES
 
 - Mask wasn’t properly used in
