@@ -1,4 +1,9 @@
 
+# OTBsegm 0.1.2
+
+Solve CRAN errors on check results.
+
+
 # OTBsegm 0.1.1
 
 Solve CRAN errors tests on Linux.
